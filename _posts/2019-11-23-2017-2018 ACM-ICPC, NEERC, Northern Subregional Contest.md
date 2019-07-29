@@ -1,34 +1,45 @@
 ---
-title: 2017-2018 ACM-ICPC, NEERC, Northern Subregional Contest
+title: 人事管理
 categories: [ACM,题解]
 abbrlink: 64193
-date: 2017-11-23 20:53:31
+date: 2019-11-23 20:53:31
 ---
 第一次练习团队配合。五小时三人共做出ABCIK五题。配合有待加强。 
 # [Auxiliary Project](https://vjudge.net/problem/Gym-101612A)
 最开始是用DP做的。
 ```cpp
-#include<fstream>
-using namespace std;
-ifstream fin("auxiliary.in");
-ofstream fout("auxiliary.out");
-int work(int k)
-{
-	static int f[1000001]= {0},
-		cost[10]= {6,2,5,5,4,5,6,3,7,6};
-	if(k<0)return 0;
-	if(f[k])return f[k];
-	for(int i=0; i!=10; ++i)
-		if(work(k-cost[i])>0||k==cost[i])
-			f[k]=max(f[k],work(k-cost[i])+i);
-	return f[k];
-}
-int main()
-{
-	int n;
-	fin>>n;
-	fout<<work(n);
-}
+@Override
+    public final void initProvisionLine(ProvisionLine provisionLineParam) {
+        XstoreFinSubject finSubject
+                = financeAccountServiceRpc.getFinSubjectByAccountCode(provisionLineParam.getAccountId());
+        if (null == finSubject) {
+            log.error("根据accountId={}获取FinanceAccountBusinessRelation对象为空",
+                    provisionLineParam.getAccountId());
+            throw new EBSSettleException(String.format("根据accountId=%s获取FinanceAccountBusinessRelation对象为空",
+                    provisionLineParam.getAccountId()));
+        }
+
+        //商户来源映射.
+        Integer venderSource
+                = CooperationTypeUtil.toVenderSource(finSubject.getCooperationTypes());
+        if (venderSource == null) {
+            String message = String.format("写计提表-根据商户合作类型获取商户来源为null,finSubject=%s", finSubject);
+            throw new EBSSettleException(message);
+        }
+
+        if (!venderSource.equals(VenderSourceEnum.JOINT_VENTURE.getCode())) {
+            log.warn("【结算写ebs】帐户accountId={}不是联营不进行处理", provisionLineParam.getAccountId());
+            return;
+        }
+
+        // 供应商简码
+        provisionLineParam.setVendorNum(String.valueOf(finSubject.getSubjectCode()));
+        List<ProvisionLine> provisionLineList = getProvisionLineList(provisionLineParam);
+        if (CollectionUtils.isEmpty(provisionLineList)) {
+            return;
+        }
+        settleProvisionLineManager.addProvisionLineList(provisionLineList);
+    }
 ```
 其实这题可以贪心：尽量用性价比最高的7，多余的用4和1去补。 
 ```cpp
