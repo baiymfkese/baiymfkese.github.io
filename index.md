@@ -8,7 +8,7 @@ showtag:
 
 {% for post in site.posts limit:8 %}
 
-- [{{ post.title }}]({{ post.url }}), *{{ post.date | date_to_string }}*
+- [{{ post.title }}]({{ post.url }}), *{{ post.date | date:"%Y-%m-%d %H:%M:%S" }}*
 
 {% if post.description %}
 
