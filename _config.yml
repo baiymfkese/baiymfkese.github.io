@@ -275,4 +275,4 @@ page404:
     homePageUrl: '/'
     homePageName: 回到我的主页
 
-theme: jekyll-theme-slate
+theme: jekyll-theme-merlot
